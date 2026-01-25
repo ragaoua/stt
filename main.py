@@ -10,37 +10,44 @@ def main():
     parser = argparse.ArgumentParser(
         description="Offline speech-to-text CLI using Faster Whisper"
     )
-    parser.add_argument(
+    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
         "--model",
         default="base",
+        type=str,
         help="Whisper model name or path (tiny, base, small, medium, large)",
     )
-    parser.add_argument(
+    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
         "--device",
         type=int,
         default=None,
         help="Input device ID (see sounddevice query if needed)",
     )
-    parser.add_argument(
+    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
         "--samplerate",
         type=int,
         default=16000,
         help="Input sample rate (default: 16000)",
     )
-    parser.add_argument(
+    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
         "--language",
         default=None,
+        type=str,
         help="Language code hint (e.g. en, fr). Defaults to auto-detect.",
     )
-    parser.add_argument(
+    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
         "--compute-type",
         default="auto",
+        type=str,
         help="Compute type (default: auto, examples: int8, float16)",
     )
     args = parser.parse_args()
 
     try:
-        model = WhisperModel(args.model, compute_type=args.compute_type)
+        model = WhisperModel(
+            args.model,
+            compute_type=args.compute_type,
+            download_root="./whisper_models/",
+        )
     except Exception as exc:
         print(f"Error loading model: {exc}", file=sys.stderr)
         sys.exit(1)
