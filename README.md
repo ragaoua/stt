@@ -16,4 +16,4 @@ uv sync
 uv run python main.py --model base
 ```
 
-Speak into your microphone. Press Ctrl+C to stop recording and transcribe the captured audio.
+Speak into your microphone. The CLI prints partial transcripts while you talk and outputs a final transcript after you press Ctrl+C.
