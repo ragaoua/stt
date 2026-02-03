@@ -1,6 +1,9 @@
 import argparse
+import datetime as _dt
+import os
 import sys
 import time
+import wave
 
 import numpy as np
 import sounddevice as sd
@@ -53,7 +56,31 @@ def main():
         default=8.0,
         help="Seconds of recent audio for partial transcription (default: 8.0)",
     )
+    parser.add_argument(
+        "--no-save-audio",
+        action="store_true",
+        help="Disable saving captured audio to a .wav file (saving is on by default)",
+    )
+    parser.add_argument(
+        "--audio-path",
+        type=str,
+        default=None,
+        help=(
+            "Path to write captured audio (.wav). Defaults to ./recordings/<timestamp>.wav"
+        ),
+    )
     args = parser.parse_args()
+
+    def save_wav_mono16(path: str, audio_f32: np.ndarray, samplerate: int) -> None:
+        audio_i16 = (np.clip(audio_f32, -1.0, 1.0) * 32767.0).astype(np.int16)
+        parent = os.path.dirname(path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        with wave.open(path, "wb") as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(samplerate)
+            wf.writeframes(audio_i16.tobytes())
 
     try:
         model = WhisperModel(
@@ -143,6 +170,18 @@ def main():
         return
 
     audio = np.concatenate(audio_chunks, axis=0).flatten()
+
+    if not args.no_save_audio:
+        audio_path = args.audio_path
+        if not audio_path:
+            ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+            audio_path = os.path.join("recordings", f"audio_{ts}.wav")
+        try:
+            save_wav_mono16(audio_path, audio, args.samplerate)
+            print(f"Saved audio: {audio_path}")
+        except Exception as exc:
+            print(f"Warning: failed to save audio: {exc}", file=sys.stderr)
+
     segments, _info = model.transcribe(audio, language=args.language, vad_filter=True)
     lines = [segment.text.strip() for segment in segments if segment.text.strip()]
     if lines:
