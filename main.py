@@ -11,31 +11,31 @@ def main():
     parser = argparse.ArgumentParser(
         description="Offline speech-to-text CLI using Faster Whisper"
     )
-    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
+    parser.add_argument(
         "--model",
         default="base",
         type=str,
         help="Whisper model name or path (tiny, base, small, medium, large)",
     )
-    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
+    parser.add_argument(
         "--device",
         type=int,
         default=None,
         help="Input device ID (see sounddevice query if needed)",
     )
-    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
+    parser.add_argument(
         "--samplerate",
         type=int,
         default=16000,
         help="Input sample rate (default: 16000)",
     )
-    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
+    parser.add_argument(
         "--language",
         default=None,
         type=str,
         help="Language code hint (e.g. en, fr). Defaults to auto-detect.",
     )
-    parser.add_argument(  # pyright: ignore[reportUnusedCallResult]
+    parser.add_argument(
         "--compute-type",
         default="auto",
         type=str,

@@ -9,3 +9,6 @@ dependencies = [
     "numpy>=1.24.4",
     "sounddevice>=0.4.6",
 ]
+
+[tool.basedpyright]
+reportUnusedCallResult = "none"
