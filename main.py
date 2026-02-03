@@ -39,6 +39,12 @@ def main():
         help="Language code hint (e.g. en, fr). Defaults to auto-detect.",
     )
     parser.add_argument(
+        "--audio-file",
+        type=str,
+        default=None,
+        help="Transcribe an audio file instead of live microphone input",
+    )
+    parser.add_argument(
         "--compute-type",
         default="auto",
         type=str,
@@ -91,6 +97,24 @@ def main():
     except Exception as exc:
         print(f"Error loading model: {exc}", file=sys.stderr)
         sys.exit(1)
+
+    if args.audio_file:
+        try:
+            segments, _info = model.transcribe(
+                args.audio_file,
+                language=args.language,
+                vad_filter=True,
+            )
+        except Exception as exc:  # pragma: no cover - CLI safety net
+            print(f"Error: {exc}", file=sys.stderr)
+            sys.exit(1)
+
+        lines = [segment.text.strip() for segment in segments if segment.text.strip()]
+        if lines:
+            print(" ".join(lines))
+        else:
+            print("No speech detected.")
+        return
 
     audio_chunks = []
     chunk_sizes = []
